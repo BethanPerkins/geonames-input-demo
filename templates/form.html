@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Using Geonames</title>
+
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+
+     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+
+    <style>
+       {# Some basic styling #}
+       #mapid { margin: 20px 10px; float: left; height: 500px; width: 500px }
+       #submit {margin-top: 10px}
+    </style>
+</head>
+<body>
+
+<title>Using Geonames</title>
+
+<form action="/" method = "POST">
+    {# Base form: #}
+    Data coverage (geographic region name):
+    <input type="text" name="user_input_geo" value="{{ region }}">
+
+    {% if topten %}
+        {# Specify location dropdown: #}
+        <div>
+            <p>Did you mean: </p>
+            <select id="target" name="target">
+                {% for loc in topten %}
+                    <option value="{{ loop.index }}">{{ loc.__str__() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    {% endif %}
+
+    <input type="submit" value="Submit" id="submit">
+</form>
+
+{% if target %}
+    {# Show the map if a bounding box has been selected: #}
+    <div id="mapid"></div>
+    <pre id="json">{{ target.__str__() }}</pre>
+
+{% endif %}
+
+
+
+<script>
+
+    {# Create the map using the geojson polygon constructed #}
+    var mymap = L.map('mapid');
+
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>,' +
+            '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy;' +
+            '<a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(mymap);
+
+    var polygon = L.geoJSON({{ geojson | safe }}).addTo(mymap);
+
+    mymap.fitBounds(polygon.getBounds(), padding=150);
+
+</script>
+</body>
+</html>
