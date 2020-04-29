@@ -25,7 +25,6 @@ def build_geojson(bbox):
             }
         }]
 
-    # return json.dumps(geojson, indent=4)
     return geojson
 
 @app.route('/', methods=['POST', 'GET'])
